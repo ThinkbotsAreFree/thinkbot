@@ -62,3 +62,13 @@ what's currently in focus is represented by a selection of relations which are c
 frames, like almost everything else, are actually relations: a frame is a (potentially long) list of the ids of relations which are currently in the frame.
 
 frames can stack. a frame can create a new frame on the stack, and manipulate it. it can also execute it, in which case the new frame becomes the current frame, until it terminates itself.
+
+## history
+
+what the system does is recorded in high level format. sequences of actions and events are like seen from the outside. the program is part of the world it observes.
+
+## infinite memory assumption
+
+this is an all-in-ram project, built on the assumption that ram size is infinite. this is because the heart of the system is mainly text-based, and because core data is meant to be hand-crafted, rather than imported from some huge db. although it doesn't mean big db can't be part of modules.
+
+
