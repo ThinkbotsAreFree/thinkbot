@@ -15,13 +15,15 @@ eno documents are loaded in ram, and indexed by elasticlunr. whatever they conta
 
 thinkbot should be usable in 2 levels of dev: high level (authoring eno data), low level (creating js modules). thinkbot should be modular, both for data and js.
 
-## eno
+## eno docs
 
-### content of eno docs
+### meta and data sections
+
+the following is a random example of enodoc:
 
     # meta
 
-    author:   Zero
+    author:   zero
     date:     2019/12/16
     keywords: eno test content
 
@@ -35,3 +37,28 @@ thinkbot should be usable in 2 levels of dev: high level (authoring eno data), l
     f6: EvaluationLink young $X
     f7: EvaluationLink beautiful $X
 
+the data lines f1, f2, ...etc. are relations.
+
+a relation has an id, like "f1".
+
+a relation is a space-separated list of tokens. tokens can be
+
+- id
+- value
+- variable
+
+the data section defines a local network of relations between relations. you can consider it's flat lispish, because the first token generally indicates the type of the relation.
+
+variables start with a "$". they represent "named holes" (wildcards), in the relations.
+
+### other sections
+
+there can be other sections, containing other kinds of structured contents.
+
+## instant focus
+
+what's currently in focus is represented by a selection of relations which are considered embedded in a "frame".
+
+frames, like almost everything else, are actually relations: a frame is a (potentially long) list of the ids of relations which are currently in the frame.
+
+frames can stack. a frame can create a new frame on the stack, and manipulate it. it can also execute it, in which case the new frame becomes the current frame, until it terminates itself.
