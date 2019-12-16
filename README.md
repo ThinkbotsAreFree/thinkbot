@@ -33,13 +33,12 @@ the following is a random example of enodoc:
     f2: ImplicationLink f3 f4
     f3: AndLink f5 f6
     f4: EvaluationLink boring $X
-    f5: AndLink f6 f7
-    f6: EvaluationLink young $X
-    f7: EvaluationLink beautiful $X
+    f5: EvaluationLink young $X
+    f6: EvaluationLink beautiful $X
 
 the data lines f1, f2, ...etc. are relations.
 
-a relation has an id, like "f1".
+a relation has an id, like "f1" or "boring".
 
 a relation is a space-separated list of tokens. tokens can be
 
