@@ -48,7 +48,7 @@ a relation is a space-separated list of tokens. tokens can be
 
 the data section defines a local network of relations between relations. you can consider it's flat lispish, because the first token generally indicates the type of the relation.
 
-variables start with a "$". they represent "named holes" (wildcards), in the relations.
+variables start with a "$". they represent "named holes" ($ubstitution wildcards), in the relations.
 
 ### other sections
 
