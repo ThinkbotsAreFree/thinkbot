@@ -29,12 +29,11 @@ the following is a random example of enodoc:
 
     # data
 
-    f1: AverageLink $X f2
-    f2: ImplicationLink f3 f4
-    f3: AndLink f5 f6
-    f4: EvaluationLink boring $X
-    f5: EvaluationLink young $X
-    f6: EvaluationLink beautiful $X
+    f1: ImplicationLink f2 f3
+    f2: AndLink f4 f5
+    f3: EvaluationLink boring $X
+    f4: EvaluationLink young $X
+    f5: EvaluationLink beautiful $X
 
 the data lines f1, f2, ...etc. are relations.
 
