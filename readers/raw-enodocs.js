@@ -2,7 +2,7 @@
 
 exports.addField = ["keywords"];
     
-exports.read = function(enodoc, index, newId) {
+exports.read = function(enodoc, index, prefix, newId) {
 
     index.addDoc({
         id: newId(),

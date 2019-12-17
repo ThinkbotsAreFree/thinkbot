@@ -48,7 +48,7 @@ newId = (function(){
 	}	
 	return function() {
 		current = addOne(current);
-		return "f"+current;
+		return "i"+current;
 	};
 })();
 
@@ -93,6 +93,9 @@ filesArray = readDir.readSync(path.join(__dirname, DATA_PATH), ["**.eno"]);
 filesArray.forEach(filename => {
 
     log("importing", filename);
+
+    var prefix = path.join(filename.slice(0, -3));
+    prefix = prefix.replace(/\\/g, '.').replace(/\//g, '.');
     
     var input = fs.readFileSync(path.join(__dirname, DATA_PATH, filename), "utf-8");
     
@@ -102,12 +105,12 @@ filesArray.forEach(filename => {
 
     readers.forEach(reader => {
 
-        reader.read(enodoc, index, newId);
+        reader.read(enodoc, index, prefix, newId);
     });
 });
 
 
 
 // test
-log(index.search("test2", {}));
+log(index.search("EvaluationLink", {}));
 
