@@ -4,14 +4,17 @@ const
     fs =   require('fs'),
     path = require("path");
 
-// http://elasticlunr.com/docs/index.html
-const elasticlunr = require("elasticlunr");
+// https://lunrjs.com/
+const lunr = require("lunr");
 
 // https://eno-lang.org/enolib/javascript/parsing-a-document/
 const enolib = require('enolib');
 
 // https://github.com/steveukx/readdir.js/
 const readDir = require("readdir");
+
+// https://github.com/aichaos/rivescript-js
+const Rivescript = require("rivescript");
 
 // file paths
 const
@@ -70,23 +73,49 @@ filesArray.forEach(filename => {
 
 // prepare main memory
 
-var index = elasticlunr();
-elasticlunr.clearStopWords();
-
-index.setRef('id');
+var fields = [];
 
 readers.forEach(reader => {
-
     reader.addField.forEach(field => {
+        if (!fields.includes(field)) {
+            log("field", field);
+            fields.push(field);
+        }
+    });
+});
 
-        log("field", field);
-        index.addField(field);
+var memory = {
+    docs: {},
+    addDoc: function addDoc(doc) { memory.docs[doc.id] = doc; },
+    removeDoc: function removeDoc(doc) { delete memory.docs[doc.id]; },
+    updateDoc: function updateDoc(doc) { memory.docs[doc.id] = doc; },
+    fetchDoc: function fetchDoc(query, option) {
+        return memory.index.search(query, option || {}).map(r => { return {
+            id: memory.docs[r.ref].id,
+            relation: memory.docs[r.ref].relation,
+            score: r.score
+        }});
+    },
+    chat: new Rivescript({ utf8: true })
+};
+
+
+
+// load rivescript brains
+
+filesArray = readDir.readSync(path.join(__dirname, DATA_PATH), ["**.rive"]);
+
+filesArray.forEach(filename => {
+
+    memory.chat.loadFile(path.join(DATA_PATH, filename)).then(function() {
+        memory.chat.sortReplies();
+        memory.me = 'me';
     });
 });
 
 
 
-// read everything in data/ folder
+// read every enothing in data/ folder
 
 filesArray = readDir.readSync(path.join(__dirname, DATA_PATH), ["**.eno"]);
 
@@ -105,12 +134,74 @@ filesArray.forEach(filename => {
 
     readers.forEach(reader => {
 
-        reader.read(enodoc, index, prefix, newId);
+        reader.read(enodoc, memory, prefix, newId);
     });
 });
 
 
 
-// test
-log(index.search("EvaluationLink", {}));
+// create lunr index
+
+memory.index = lunr(function() {
+
+    this.ref("id");
+    fields.forEach(f => { this.field(f); });
+    Object.keys(memory.docs).forEach(function(docId) {
+        log("adding "+docId);
+        this.add(memory.docs[docId]);
+    }, this);
+});
+
+
+
+
+
+
+function overview(results) {
+
+    var ref = {};
+    results.forEach(result => { ref[result.id] = result; });
+
+    results.forEach(result => {
+
+        var takenTokens = [];
+        var tokenCount = -1;
+        result.expandedScore = result.score;
+            
+        while (tokenCount != takenTokens.length) {
+
+            tokenCount = takenTokens.length;
+
+            result.relation = result.relation.split(' ');
+
+            result.expandedRelation = result.relation.map(token => {
+
+                if (ref[token]) {
+                    if (!takenTokens.includes(token)) {
+                        takenTokens.push(token);
+                        result.expandedScore += ref[token].score;
+                    }
+                    return ref[token].relation;
+                }
+                else
+                    return token;
+            }).join(' ');
+
+            result.relation = result.expandedRelation;
+        }
+    });
+
+    return results;
+}
+
+
+
+log(overview(memory.fetchDoc("ImplicationLink EvaluationLink AndLink")));
+
+setTimeout(function() {
+    memory.chat.reply(memory.chat.me, "hello").then(function(reply) {
+        console.log("The bot says: " + reply);
+    });
+    
+}, 1000);
 

@@ -1,0 +1,20 @@
+{
+    "name": "thinkbot",
+    "version": "0.0.1",
+    "license": "wtf",
+    "main": "main.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ThinkbotsAreFree/thinkbot.git"
+    },
+    "scripts": {
+        "start": "node main.js"
+    },
+    "dependencies": {
+        "enolib": "*",
+        "seneca": "*",
+        "rivescript": "*",
+        "lunr": "*",
+        "readdir": "*"
+    }
+}
