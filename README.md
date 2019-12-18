@@ -5,9 +5,9 @@ thinkbot's like a chatbot, except it thinks instead of chatting.
 ## libraries used
 
 - [eno](https://eno-lang.org/)
-- [lunr](https://github.com/hoelzro/lunr-mutable-indexes)
-- [seneca](http://senecajs.org/getting-started/)
-- [rivescript](https://www.rivescript.com/docs/tutorial)
+- [lunr](https://lunrjs.com/)
+- [seneca](http://senecajs.org/)
+- [rivescript](https://www.rivescript.com/)
 
 ## main idea
 
