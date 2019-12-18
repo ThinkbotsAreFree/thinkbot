@@ -10,11 +10,16 @@ const lunr = require("lunr");
 // https://eno-lang.org/enolib/javascript/parsing-a-document/
 const enolib = require('enolib');
 
+// https://github.com/aichaos/rivescript-js
+const Rivescript = require("rivescript");
+
+// http://senecajs.org/
+const Seneca = require('seneca');
+
 // https://github.com/steveukx/readdir.js/
 const readDir = require("readdir");
 
-// https://github.com/aichaos/rivescript-js
-const Rivescript = require("rivescript");
+
 
 // file paths
 const
@@ -57,7 +62,7 @@ newId = (function(){
 
 
 
-// requiring everything in readers/ folder
+// require everything in readers/ folder
 
 var filesArray = readDir.readSync(path.join(__dirname, READERS_PATH), ["**.js"]);
 
@@ -196,12 +201,31 @@ function overview(results) {
 
 
 
+// seneca
+
+var seneca = Seneca().quiet();
+
+var filesArray = readDir.readSync(path.join(__dirname, DATA_PATH), ["**.js"]);
+
+filesArray.forEach(filename => {
+
+    log("plugin "+filename);
+    seneca.use(path.join(__dirname, DATA_PATH, filename));
+});
+
+
+
 log(overview(memory.fetchDoc("ImplicationLink EvaluationLink AndLink")));
 
 setTimeout(function() {
+
     memory.chat.reply(memory.chat.me, "hello").then(function(reply) {
-        console.log("The bot says: " + reply);
+        log("The bot says: " + reply);
     });
-    
+
+    seneca.act({say:'hello',foo:"bar"}, function(err,res) {
+        console.log(res);
+    });
+
 }, 1000);
 
