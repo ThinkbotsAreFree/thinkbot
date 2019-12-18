@@ -16,3 +16,6 @@ thinkbot's like a chatbot, except it thinks instead of chatting.
 - process thought frame (seneca)
 - loop using chatbot reply as new query
 
+## doc?
+
+⤷ [wiki](https://github.com/ThinkbotsAreFree/thinkbot/wiki)
