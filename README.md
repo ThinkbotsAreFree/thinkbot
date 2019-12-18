@@ -11,11 +11,13 @@ thinkbot's like a chatbot, except it thinks instead of chatting.
 
 ## main idea
 
-eno documents are loaded in ram, and indexed by elasticlunr. whatever they contain, the main loop is:
-- make a search,
-- process fetched data.
+eno documents are loaded in ram, and indexed by lunr. whatever they contain, the main loop is:
+- make a search based on previous frame (lunr),
+- feed results overview to chatbot (rivescript),
+- process the current thought frame (seneca),
+- loop using chatbot reply as new query.
 
-thinkbot should be usable in 2 levels of dev: high level (authoring eno data), low level (creating js modules). thinkbot should be modular, both for data and js.
+thinkbot should be usable in 2 levels of dev: high level (authoring eno data / ), low level (creating js modules). thinkbot should be modular, both for data and js.
 
 ## eno docs
 
