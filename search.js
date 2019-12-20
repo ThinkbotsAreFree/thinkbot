@@ -61,7 +61,7 @@ exports.getDoc = function(id) {
 
 exports.getRelation = function(id) {
 
-    return memory.index[id].relation;
+    return memory.index[id] ? memory.index[id].relation : [];
 }
 
 
@@ -166,6 +166,34 @@ exports.expandRelations = function(results) {
     });
 
     return results.filter(r => !noTop.includes(r.id));
+}
+
+
+
+exports.exploreForward = function(list) {
+
+    var result = [];
+
+    list.forEach(item => {
+
+        result = result.concat(exports.getRelation(item));
+    });
+
+    return result;
+}
+
+
+
+exports.exploreBackward = function(list) {
+
+    var result = [];
+
+    list.forEach(item => {
+
+        result = result.concat(exports.getBacklink(item));
+    });
+
+    return result;
 }
 
 

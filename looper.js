@@ -12,13 +12,17 @@ exports.register = function(filepath, engine, readDoc) {
     engines[id] = engine;
 
     readDoc(`
+
         # data
 
         type: ObjectType, Engine, ${id}
+
         input: EngineInput, ${id}, inputFrame
         output: EngineOutput, ${id}, outputFrame
+
         inputFrame
         outputFrame
+        
     `, filepath.slice(0,-2).replace(/\\/g, '.').replace(/\//g, '.'));
 }
 
