@@ -78,6 +78,10 @@ function() {
 
 
 
+observer.pushActor("main.js");
+
+
+
 // require everything in readers/ folder
 
 var filesArray = readDir.readSync(path.join(__dirname, READERS_PATH), ["**.js"]);
@@ -105,6 +109,8 @@ function readDoc(enodoc, prefix) {
 
 // read every enothing in data/ folder
 
+observer.pushActor("data folder");
+
 filesArray = readDir.readSync(path.join(__dirname, DATA_PATH), ["**.eno"]);
 
 filesArray.forEach(filename => {
@@ -123,9 +129,13 @@ filesArray.forEach(filename => {
     readDoc(enodoc, prefix);
 });
 
+observer.popActor();
+
 
 
 // load everything in engines/ folder
+
+observer.pushActor("engines folder");
 
 var filesArray = readDir.readSync(path.join(__dirname, ENGINES_PATH), ["**.js"]);
 
@@ -138,6 +148,8 @@ filesArray.forEach(filename => {
         readDoc
     );
 });
+
+observer.popActor();
 
 
 
@@ -166,4 +178,4 @@ log(
 );
 
 
-log("[observer.gQueue]", observer.gQueue);
+log("[observer.eQueue]", observer.eQueue);

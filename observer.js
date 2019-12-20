@@ -1,12 +1,11 @@
 
 
 
-var actor = '';
+var actor = [];
 
 
 
-var gQueue = [],    // global
-    tagQueue = {};  // specific
+var eQueue = [];
 
 
 
@@ -20,43 +19,91 @@ const eTags = [
 
 
 
-exports.setActor = function(name) {
+const
+    tagMailingList = {},
+    inbox = {};
 
-    actor = name.toString();
+
+
+exports.pushActor = function(name) {
+
+    actor.push(name.toString());
+};
+
+
+
+exports.popActor = function() {
+
+    actor.pop();
 };
 
 
 
 exports.signal = function(eventTags, eventDescription) {
 
-    eventTags.forEach(tag => { if (!eTags.includes(tag)) throw "Unknown tag: "+tag; });
-
     evObject = {
         time: (new Date()).getTime(),
-        actor: actor,
+        actor: actor.slice(0),
         tags: eventTags.slice(0),
         description: JSON.parse(JSON.stringify(eventDescription))
     };
 
-    gQueue.push(evObject);
+    eQueue.push(evObject);
 
     eventTags.forEach(tag => {
+        
+        if (!eTags.includes(tag)) throw "Unknown tag: "+tag;
 
-        if (!tagQueue[tag]) tagQueue[tag] = [];
-        tagQueue[tag].push(evObject);
+        if (tagMailingList[tag]) tagMailingList[tag].forEach(engineId => {
+
+            if (!inbox[engineId]) inbox[engineId] = [];
+            inbox[engineId].push(evObject);
+        });
     });
 }
 
 
 
+exports.observe = function(eventTags, engineId) {
+
+    eventTags.forEach(tag => {
+
+        if (!tagMailingList[tag]) tagMailingList[tag] = [];
+        tagMailingList[tag].push(engineId);
+    });  
+}
+
+
+
+exports.ignore = function(eventTags, engineId) {
+
+    eventTags.forEach(tag => {
+
+        if (!tagMailingList[tag]) throw "Ignore non-observed tag: "+tag;
+        tagMailingList[tag] = tagMailingList[tag].filter(id => id != engineId);
+    });  
+}
+
+
+
+exports.dispatch = function(handler) {
+
+    var savedInbox = inbox;
+    exports.clean();
+
+    for (var i in savedInbox) handler(i, savedInbox[i]);
+};
+
+
+
 exports.clean = function() {
 
-    gQueue = [];
-    tagQueue = {};
+    eQueue = [];
+    inbox = {};
 }
 
 
 
 // testing purpose
 
-exports.gQueue = gQueue;
+exports.eQueue = eQueue;
