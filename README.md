@@ -5,16 +5,17 @@ thinkbot's like a chatbot, except it thinks instead of chatting.
 ## libraries used
 
 - [eno](https://eno-lang.org/)
-- [lunr](https://lunrjs.com/)
-- [seneca](http://senecajs.org/)
-- [rivescript](https://www.rivescript.com/)
 
 ## main loop
 
-- make a search (lunr)
-- feed results overview to chatbot (rivescript)
-- process thought frame (seneca)
-- loop using chatbot reply as new query
+- make a search
+- feed results overview to graphmaster
+- process thought frame
+- loop using graphmaster reply as new query
+
+## focus
+
+some relations are in a "focus frame". frames can stack.
 
 ## history
 
