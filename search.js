@@ -17,14 +17,29 @@ module.exports = function(observer) {
 
         if (memory.index[id]) throw "ID already used: "+id;
 
+        observer.signal(
+            [ "addDoc", "write" ],
+            { docId: id }
+        );
+
         memory.index[id] = doc;
 
         for (var field in doc) if (field != "id") {
+
+            observer.signal(
+                [ "addDoc field", "write" ],
+                { docId: id, field: field }
+            );
 
             var line = doc[field];
             if (typeof line == "string") line = line.split(' ');
             if (!Array.isArray(line)) line = [line];
             line.forEach(token => {
+
+                observer.signal(
+                    [ "addDoc inverted ref", "write" ],
+                    { docId: id, field: field, ref: token }
+                );
 
                 if (!memory.invertedIndex[token])
                     memory.invertedIndex[token] = [];
@@ -39,7 +54,7 @@ module.exports = function(observer) {
 
     module.removeDoc = function(id) {
 
-        if (!memory.index[id]) throw "ID unknown: "+id;
+        if (!memory.index[id]) throw "Unknown ID: "+id;
 
         var doc = memory.index[id];
 

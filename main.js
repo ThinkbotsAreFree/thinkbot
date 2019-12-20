@@ -166,3 +166,4 @@ log(
 );
 
 
+log("[observer.gQueue]", observer.gQueue);
