@@ -1,7 +1,7 @@
 {
     "name": "thinkbot",
     "version": "0.0.1",
-    "license": "wtf",
+    "license": "what the fuck",
     "main": "main.js",
     "repository": {
         "type": "git",
@@ -12,9 +12,7 @@
     },
     "dependencies": {
         "enolib": "*",
-        "seneca": "*",
-        "rivescript": "*",
-        "lunr": "*",
+        "enotype": "*",
         "readdir": "*"
     }
 }

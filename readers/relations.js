@@ -17,7 +17,7 @@ exports.read = function(enodoc, memory, prefix, newId) {
 
     for (var sk in table) {
 
-        table[sk].relation = data.field(sk).optionalStringValue().split(' ');
+        table[sk].relation = data.field(sk).requiredCommaSeparatedValue();
 
         // rewriting local ids
         for (var r=0; r<table[sk].relation.length; r++) {
@@ -26,10 +26,11 @@ exports.read = function(enodoc, memory, prefix, newId) {
                 table[sk].relation[r] = table[table[sk].relation[r]].id;
         }
 
-        table[sk].relation = table[sk].relation.join(' ');
+        //table[sk].relation = table[sk].relation.join(' ');
 
-        memory.addDoc(table[sk]);
+        memory.addDoc(table[sk].id, table[sk]);
     }
+
 };
 
 

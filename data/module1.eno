@@ -7,8 +7,8 @@ keywords: eno test1 content
 
 # data
 
-f1: ImplicationLink f2 f3
-f2: AndLink f4 f5
-f3: EvaluationLink boring $X
-f4: EvaluationLink young $X
-f5: EvaluationLink beautiful $X
+f1: ImplicationLink, f2, f3
+f2: AndLink, f4, f5
+f3: EvaluationLink, boring, $X
+f4: EvaluationLink, young, $X
+f5: EvaluationLink, beautiful, $X
