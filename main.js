@@ -1,13 +1,15 @@
 
 
 
+const observer = require("./observer.js");
+
 const
     fs =     require('fs'),
     path =   require("path"),
-    graph =  require("./graph.js"),
-    search = require("./search.js"),
     newId =  require("./id-gen.js"),
-    looper = require("./looper.js");
+    graph =  require("./graph.js")(observer),
+    search = require("./search.js")(observer),
+    looper = require("./looper.js")(observer);
     
 // https://eno-lang.org/enolib/javascript/parsing-a-document/
 const enolib = require('enolib');
@@ -144,19 +146,23 @@ filesArray.forEach(filename => {
 
 
 log("[search.memory.index]", search.memory.index);
-//log(search.memory.invertedIndex);
+log("[search.memory.invertedIndex]", search.memory.invertedIndex);
 
 log(
-    "[EngineOutput of eng2]",
-    search.getDoc(
-        search.find([], ["eng2", "EngineOutput"])[0].id
-    ).relation[2]
+    "[core.ObjectType of eng2]",
+    search.neighbourhood(["core.Engine", "core.ObjectType"])
+);
+
+log(
+    "[search]",
+    search.find([], ["core.Engine"]).map(r => r.id)
 );
 
 log(
     "[backward]",
     search.exploreBackward(
-        search.find([], ["Engine"]).map(r => r.id)
+        search.find([], ["core.Engine"]).map(r => r.id)
     )
 );
+
 

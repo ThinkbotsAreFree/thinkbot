@@ -1,29 +1,37 @@
+module.exports = function(observer) {
 
 
 
-const engines = {}
+    var module = {};
 
 
 
-exports.register = function(filepath, engine, readDoc) {
+    const engines = {}
 
-    var id = filepath.slice(0, -3).replace(/\\/g, '.').replace(/\//g, '.');
 
-    engines[id] = engine;
 
-    readDoc(`
+    module.register = function(filepath, engine, readDoc) {
 
-        # data
+        var id = filepath.slice(0, -3).replace(/\\/g, '.').replace(/\//g, '.');
 
-        type: ObjectType, Engine, ${id}
+        engines[id] = engine;
 
-        input: EngineInput, ${id}, inputFrame
-        output: EngineOutput, ${id}, outputFrame
+        readDoc(`
 
-        inputFrame
-        outputFrame
-        
-    `, filepath.slice(0,-2).replace(/\\/g, '.').replace(/\//g, '.'));
+            # data
+
+            type: core.ObjectType, core.Engine, ${id}
+
+            input: EngineInput, ${id}, inputFrame
+            output: EngineOutput, ${id}, outputFrame
+
+            inputFrame
+            outputFrame
+
+        `, filepath.slice(0,-2).replace(/\\/g, '.').replace(/\//g, '.'));
+    }
+
+    
+
+    return module;
 }
-
-

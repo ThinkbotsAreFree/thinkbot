@@ -1,76 +1,86 @@
+module.exports = function(observer) {
 
 
 
-const tree = {};
+    var module = {};
+
+
+    
+    const tree = {};
 
 
 
-exports.setLine = function(line, fruit) {
+    module.setLine = function(line, fruit) {
 
-    var cursor = tree,
-        parent;
+        var cursor = tree,
+            parent;
 
-    line.forEach(token => {
+        line.forEach(token => {
 
-        if (!cursor[token]) cursor[token] = { branch: {}, count: 0 };
-        parent = cursor[token];
-        cursor[token].count += 1;
-        cursor = cursor[token].branch;
-    });
-    parent.fruit = fruit;
-};
+            if (!cursor[token]) cursor[token] = { branch: {}, count: 0 };
+            parent = cursor[token];
+            cursor[token].count += 1;
+            cursor = cursor[token].branch;
+        });
+        parent.fruit = fruit;
+    };
 
 
 
-exports.removeLine = function(rawLine) {
+    module.removeLine = function(rawLine) {
 
-    var cursor = tree,
-        line = rawLine.slice(0);
+        var cursor = tree,
+            line = rawLine.slice(0);
 
-    while (line.length) {
+        while (line.length) {
 
-        if (cursor[line[0]].count == 1) {
-            delete cursor[line[0]];
-            line = [];
-        } else {
-            cursor[line[0]].count -= 1;
-            cursor = cursor[line[0]].branch;
-            line.shift();
+            if (cursor[line[0]].count == 1) {
+                delete cursor[line[0]];
+                line = [];
+            } else {
+                cursor[line[0]].count -= 1;
+                cursor = cursor[line[0]].branch;
+                line.shift();
+            }
         }
-    }
-};
+    };
 
 
 
-function query(line, cursor) {
+    function query(line, cursor) {
 
-    var found;
+        var found;
 
-    if (line.length > 1) {
+        if (line.length > 1) {
 
-        if (cursor[line[0]]) found = query(line.slice(1), cursor[line[0]].branch);
-        if (found) return found;
-        
-        if (cursor['?']) found = query(line.slice(1), cursor['?'].branch);
-        if (found) return found;
-        
-        if (cursor['*']) while (!found && line.length > 1) {
-            line.shift();
-            found = query(line, cursor['*'].branch);
+            if (cursor[line[0]]) found = query(line.slice(1), cursor[line[0]].branch);
+            if (found) return found;
+            
+            if (cursor['?']) found = query(line.slice(1), cursor['?'].branch);
+            if (found) return found;
+            
+            if (cursor['*']) while (!found && line.length > 1) {
+                line.shift();
+                found = query(line, cursor['*'].branch);
+            }
+            if (found) return found;
+            if (cursor['*']) return cursor['*'].fruit;
+
+            return undefined;
         }
-        if (found) return found;
+        if (cursor[line[0]]) return cursor[line[0]].fruit;
+        if (cursor['?']) return cursor['?'].fruit;
         if (cursor['*']) return cursor['*'].fruit;
-
-        return undefined;
     }
-    if (cursor[line[0]]) return cursor[line[0]].fruit;
-    if (cursor['?']) return cursor['?'].fruit;
-    if (cursor['*']) return cursor['*'].fruit;
+
+
+
+    module.queryLine = function(line) {
+
+        return query(line.slice(0), tree);
+    };
+
+
+
+    return module;
 }
-
-
-
-exports.queryLine = function(line) {
-
-    return query(line.slice(0), tree);
-};

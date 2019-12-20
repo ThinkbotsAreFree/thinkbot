@@ -1,4 +1,6 @@
 
+
+
 # meta
 
 > System core relations
@@ -7,6 +9,12 @@ author:   zero
 date:     2019/12/20
 keywords: core
 
+
+
 # data
 
-Root: Engine
+Root: ObjectType
+
+ObjectType: Engine
+
+Engine
