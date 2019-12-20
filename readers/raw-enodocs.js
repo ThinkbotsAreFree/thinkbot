@@ -2,14 +2,14 @@
 
 exports.addField = ["keywords"];
     
-exports.read = function(enodoc, memory, prefix, newId) {
+exports.read = function(enodoc, search, graph, prefix, newId) {
 
     var id = newId();
 
-    memory.addDoc(id, {
+    /*search.addDoc(id, {
         id: id,
         keywords: enodoc.section("meta").field("keywords").requiredStringValue(),
         enodoc: enodoc
-    });
+    });*/
 
 };

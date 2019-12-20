@@ -1,17 +1,30 @@
 
 
+
 const
     fs =     require('fs'),
     path =   require("path"),
     graph =  require("./graph.js"),
     search = require("./search.js"),
-    newId =  require("./id-gen.js");
+    newId =  require("./id-gen.js"),
+    looper = require("./looper.js");
     
 // https://eno-lang.org/enolib/javascript/parsing-a-document/
 const enolib = require('enolib');
-const { boolean, color, commaSeparated, date, datetime, email, float, integer, json, latLng, url } =
-    require('enotype');
-enolib.register({ commaSeparated });
+const {
+    boolean,
+    //color,
+    commaSeparated,
+    //date,
+    //datetime,
+    //email,
+    //float,
+    //integer,
+    //json,
+    //latLng,
+    //url
+} = require('enotype');
+enolib.register({ boolean, commaSeparated });
 
 // https://github.com/steveukx/readdir.js/
 const readDir = require("readdir");
@@ -21,13 +34,14 @@ const readDir = require("readdir");
 // file paths
 const
     DATA_PATH =    "data",
-    READERS_PATH = "readers";
+    READERS_PATH = "readers",
+    ENGINES_PATH = "engines";
 
 // list of enodoc readers
 const readers = [];
 
-// log
-const log = console.log;
+// switchable log
+const log = 1 ? console.log : ()=>{};
 
 
 
@@ -37,11 +51,22 @@ var filesArray = readDir.readSync(path.join(__dirname, READERS_PATH), ["**.js"])
 
 filesArray.forEach(filename => {
 
-    log("requiring", filename);
+    log("[readers]", filename);
     readers.push(
         require(path.join(__dirname, READERS_PATH, filename))
     );
 });
+
+function readDoc(enodoc, prefix) {
+
+    prefix = prefix || newId()+'.';
+
+    if (typeof enodoc == "string") enodoc = enolib.parse(enodoc);
+
+    readers.forEach(reader => {
+        reader.read(enodoc, search, graph, prefix, newId);
+    });
+}
 
 
 
@@ -51,7 +76,7 @@ filesArray = readDir.readSync(path.join(__dirname, DATA_PATH), ["**.eno"]);
 
 filesArray.forEach(filename => {
 
-    log("importing", filename);
+    log("[data]", filename);
 
     var prefix = path.join(filename.slice(0, -3));
     prefix = prefix.replace(/\\/g, '.').replace(/\//g, '.');
@@ -62,40 +87,39 @@ filesArray.forEach(filename => {
         source: path.join(__dirname, DATA_PATH)
     });
 
-    log(enodoc.toString());
-
-    readers.forEach(reader => {
-
-        reader.read(enodoc, search, prefix, newId);
-    });
+    readDoc(enodoc, prefix);
 });
 
 
-log("[SEARCH.MEMORY]");
-log(search.memory);
 
-res = search.find(["ImplicationLink", "module1.f2"]);
+// load everything in engines/ folder
 
-log("[RES]");
-log(res);
+var filesArray = readDir.readSync(path.join(__dirname, ENGINES_PATH), ["**.js"]);
 
-log("[EXPANDRELATIONS]");
-log(search.expandRelations(res));
+filesArray.forEach(filename => {
 
-
-/*
-graph.setLine(["one", "*", "three"], "myFruit1");
-graph.setLine(["one", "two"], "myFruit2");
-graph.setLine(["one", "*"], "myFruit3");
-graph.setLine(["*", "three"], "myFruit4");
+    log("[engines]", filename);
+    looper.register(
+        path.join(filename),
+        require(path.join(__dirname, ENGINES_PATH, filename)),
+        readDoc
+    );
+});
 
 
-graph.removeLine(["one", "two"]);
+
+/* **** */
 
 
-var test = ["foo", "two", "three"];
-log(graph.queryLine(test));
-log(test);
-*/
+
+log("[search.memory.index]", search.memory.index);
+//log(search.memory.invertedIndex);
+
+log(
+    "[EngineOutput of eng2]",
+    search.getDoc(
+        search.find([], ["eng2", "EngineOutput"])[0].id
+    ).relation[2]
+);
 
 

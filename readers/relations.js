@@ -2,7 +2,9 @@
 
 exports.addField = ["relation"];
     
-exports.read = function(enodoc, memory, prefix, newId) {
+exports.read = function(enodoc, search, graph, prefix, newId) {
+
+    if (enodoc.section("meta").field("inhibited").optionalBooleanValue()) return;
 
     // the data section contains relations
     var data = enodoc.section("data");
@@ -17,7 +19,11 @@ exports.read = function(enodoc, memory, prefix, newId) {
 
     for (var sk in table) {
 
-        table[sk].relation = data.field(sk).requiredCommaSeparatedValue();
+        table[sk].relation = [];
+
+        try {
+            table[sk].relation = data.field(sk).optionalCommaSeparatedValue();
+        } catch(e) {}
 
         // rewriting local ids
         for (var r=0; r<table[sk].relation.length; r++) {
@@ -28,7 +34,7 @@ exports.read = function(enodoc, memory, prefix, newId) {
 
         //table[sk].relation = table[sk].relation.join(' ');
 
-        memory.addDoc(table[sk].id, table[sk]);
+        search.addDoc(table[sk].id, table[sk]);
     }
 
 };

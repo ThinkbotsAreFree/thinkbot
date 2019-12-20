@@ -1,9 +1,10 @@
 
 # meta
 
-author:   zero
-date:     2019/12/16
-keywords: eno test2 content
+author:    zero
+date:      2019/12/16
+keywords:  eno test2 content
+inhibited: yes
 
 # data
 
@@ -12,3 +13,21 @@ f2: AndLink, f4, f5
 f3: EvaluationLink, boring, $X
 f4: EvaluationLink, young, $X
 f5: EvaluationLink, beautiful, $X
+
+# graph
+
+test1:
+i = one, *, three
+o = fruit 1
+
+test2:
+i = one, two
+o = fruit 2
+
+test3:
+i = one, *
+o = fruit 3
+
+test2:
+i = *, three
+o = fruit 4
