@@ -28,7 +28,7 @@ const eTags = [
         "find",
         "exploreForward",
         "exploreBackward",
-        "neighborhood",
+        "neighbourhood",
 
     "graph",
         "setLine",

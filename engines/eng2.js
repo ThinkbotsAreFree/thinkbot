@@ -9,16 +9,16 @@ exports.observedTags = ["addDoc"];
 
 
 
-exports.receive = function(inbox) {
+exports.prepare = function(inbox, search, graph) {
 
     return "[INBOX]"+JSON.stringify(inbox[0].actor);
 }
 
 
 
-exports.execute = function(action) {
+exports.execute = function(action, id, actionList) {
 
-    console.log("\n=> "+action);
+    console.log("\n=> ",actionList);
 }
 
 

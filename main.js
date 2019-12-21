@@ -6,10 +6,8 @@ const observer = require("./observer.js");
 const
     fs =     require('fs'),
     path =   require("path"),
-    newId =  require("./id-gen.js"),
-    search = require("./search.js")(observer, newId),
-    graph =  require("./graph.js")(observer),
-    looper = require("./looper.js")(observer, search);
+    search = require("./search.js")(observer),
+    graph =  require("./graph.js")(observer);
     
 // https://eno-lang.org/enolib/javascript/parsing-a-document/
 const enolib = require('enolib');
@@ -78,6 +76,10 @@ function() {
 
 
 
+String.prototype.prefix = function(nc) { return this.slice(0, -nc).replace(/[\/\\]/g, '.'); };
+
+
+
 observer.pushActor("main.js");
 
 
@@ -101,7 +103,7 @@ function readDoc(enodoc, prefix) {
     if (typeof enodoc == "string") enodoc = enolib.parse(enodoc);
 
     readers.forEach(reader => {
-        reader.read(enodoc, search, graph, prefix, newId);
+        reader.read(enodoc, search, graph, prefix);
     });
 }
 
@@ -117,8 +119,7 @@ filesArray.forEach(filename => {
 
     log("[data]", filename);
 
-    var prefix = path.join(filename.slice(0, -3));
-    prefix = prefix.replace(/[\/\\]/g, '.');
+    var prefix = path.join(filename).prefix(3);
     
     var input = fs.readFileSync(path.join(__dirname, DATA_PATH, filename), "utf-8");
     
@@ -135,6 +136,8 @@ observer.popActor();
 
 // load everything in engines/ folder
 
+const engines = {};
+
 observer.pushActor("engines folder");
 
 var filesArray = readDir.readSync(path.join(__dirname, ENGINES_PATH), ["**.js"]);
@@ -142,16 +145,40 @@ var filesArray = readDir.readSync(path.join(__dirname, ENGINES_PATH), ["**.js"])
 filesArray.forEach(filename => {
 
     log("[engines]", filename);
-    looper.register(
-        path.join(filename),
-        require(path.join(__dirname, ENGINES_PATH, filename)),
-        readDoc
-    );
+
+    var id = path.join(filename).prefix(3);
+
+    engines[id] = require(path.join(__dirname, ENGINES_PATH, filename));
+
+    if (engines[id].observedTags) {
+        
+        observer.observe(engines[id].observedTags, id);
+        engines[id].observedTags.forEach(tag => { search.link(["ObserverSubscription", id, tag]); });
+    }
+
+    search.link(["core.ObjectType", id, "core.Engine"]);
+
 });
 
 observer.popActor();
 
 
 
-looper.step();
+// one cycle
+
+function step() {
+
+    var actions = {};
+
+    observer.dispatch(function(engId, inbox) {
+
+        if (engines[engId].prepare) actions[engId] = engines[engId].prepare(inbox, search, graph);
+    });
+
+    for (var engId in actions) engines[engId].execute(actions[engId], engId, actions);
+};
+
+
+
+step();
 

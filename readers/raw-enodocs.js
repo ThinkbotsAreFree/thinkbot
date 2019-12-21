@@ -2,9 +2,9 @@
 
 exports.addField = ["keywords"];
     
-exports.read = function(enodoc, search, graph, prefix, newId) {
+exports.read = function(enodoc, search, graph, prefix) {
 
-    var id = newId();
+    var id = search.newId();
 
     /*search.addDoc(id, {
         id: id,
