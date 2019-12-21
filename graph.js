@@ -5,7 +5,7 @@ module.exports = function(observer) {
     var module = {};
 
 
-    
+
     const tree = {};
 
 
@@ -14,6 +14,11 @@ module.exports = function(observer) {
 
         var cursor = tree,
             parent;
+
+        observer.signal(
+            ["graph", "setLine", "write"],
+            { line: line, fruit: fruit }
+        )
 
         line.forEach(token => {
 
@@ -31,6 +36,11 @@ module.exports = function(observer) {
 
         var cursor = tree,
             line = rawLine.slice(0);
+
+        observer.signal(
+            ["graph", "removeLine", "write"],
+            { line: line }
+        )
 
         while (line.length) {
 
@@ -77,7 +87,14 @@ module.exports = function(observer) {
 
     module.queryLine = function(line) {
 
-        return query(line.slice(0), tree);
+        var result = query(line.slice(0), tree);
+
+        observer.signal(
+            ["graph", "queryLine", "read"],
+            { line: line, fruit: result }
+        )
+
+        return result;
     };
 
 

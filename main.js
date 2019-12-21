@@ -7,9 +7,9 @@ const
     fs =     require('fs'),
     path =   require("path"),
     newId =  require("./id-gen.js"),
+    search = require("./search.js")(observer, newId),
     graph =  require("./graph.js")(observer),
-    search = require("./search.js")(observer),
-    looper = require("./looper.js")(observer);
+    looper = require("./looper.js")(observer, search);
     
 // https://eno-lang.org/enolib/javascript/parsing-a-document/
 const enolib = require('enolib');
@@ -118,7 +118,7 @@ filesArray.forEach(filename => {
     log("[data]", filename);
 
     var prefix = path.join(filename.slice(0, -3));
-    prefix = prefix.replace(/\\/g, '.').replace(/\//g, '.');
+    prefix = prefix.replace(/[\/\\]/g, '.');
     
     var input = fs.readFileSync(path.join(__dirname, DATA_PATH, filename), "utf-8");
     
@@ -153,29 +153,5 @@ observer.popActor();
 
 
 
-/* **** */
+looper.step();
 
-
-
-log("[search.memory.index]", search.memory.index);
-log("[search.memory.invertedIndex]", search.memory.invertedIndex);
-
-log(
-    "[core.ObjectType of eng2]",
-    search.neighbourhood(["core.Engine", "core.ObjectType"])
-);
-
-log(
-    "[search]",
-    search.find([], ["core.Engine"]).map(r => r.id)
-);
-
-log(
-    "[backward]",
-    search.exploreBackward(
-        search.find([], ["core.Engine"]).map(r => r.id)
-    )
-);
-
-
-log("[observer.eQueue]", observer.eQueue);

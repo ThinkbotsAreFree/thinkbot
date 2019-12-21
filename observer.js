@@ -5,23 +5,41 @@ var actor = [];
 
 
 
-var eQueue = [];
+var eQueue = [],
+    inbox = {};
 
 
 
 const eTags = [
-    "addDoc",
-    "addDoc field",
-    "addDoc inverted ref",
+
     "write",
-    "read"
+    "read",
+
+    "search",
+        "addDoc",
+        "addDoc field",
+        "addDoc inverted ref",
+        "removeDoc",
+        "removeDoc field",
+        "removeDoc inverted ref",
+        "getDoc",
+        "getRelation",
+        "getBacklink",
+        "find",
+        "exploreForward",
+        "exploreBackward",
+        "neighborhood",
+
+    "graph",
+        "setLine",
+        "removeLine",
+        "queryLine"
 ];
 
 
 
 const
-    tagMailingList = {},
-    inbox = {};
+    tagMailingList = {};
 
 
 
@@ -91,7 +109,7 @@ exports.dispatch = function(handler) {
     var savedInbox = inbox;
     exports.clean();
 
-    for (var i in savedInbox) handler(i, savedInbox[i]);
+    for (var engId in savedInbox) handler(engId, savedInbox[engId]);
 };
 
 

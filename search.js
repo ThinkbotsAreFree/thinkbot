@@ -1,4 +1,4 @@
-module.exports = function(observer) {
+module.exports = function(observer, newId) {
 
 
 
@@ -18,7 +18,7 @@ module.exports = function(observer) {
         if (memory.index[id]) throw "ID already used: "+id;
 
         observer.signal(
-            [ "addDoc", "write" ],
+            [ "search", "addDoc", "write" ],
             { docId: id }
         );
 
@@ -27,7 +27,7 @@ module.exports = function(observer) {
         for (var field in doc) if (field != "id") {
 
             observer.signal(
-                [ "addDoc field", "write" ],
+                [ "search", "addDoc field", "write" ],
                 { docId: id, field: field }
             );
 
@@ -37,7 +37,7 @@ module.exports = function(observer) {
             line.forEach(token => {
 
                 observer.signal(
-                    [ "addDoc inverted ref", "write" ],
+                    [ "search", "addDoc inverted ref", "write" ],
                     { docId: id, field: field, ref: token }
                 );
 
@@ -56,11 +56,26 @@ module.exports = function(observer) {
 
         if (!memory.index[id]) throw "Unknown ID: "+id;
 
+        observer.signal(
+            [ "search", "removeDoc", "write" ],
+            { docId: id }
+        );
+
         var doc = memory.index[id];
 
         for (var field in doc) {
 
+            observer.signal(
+                [ "search", "removeDoc field", "write" ],
+                { docId: id, field: field }
+            );
+
             doc[field].forEach(token => {
+
+                observer.signal(
+                    [ "search", "removeDoc inverted ref", "write" ],
+                    { docId: id, field: field, ref: token }
+                );
 
                 memory.invertedIndex[token] = memory.invertedIndex[token].filter(ref => ref != id);
                 if (memory.invertedIndex[token].length == 0) delete memory.invertedIndex[token];
@@ -74,6 +89,11 @@ module.exports = function(observer) {
 
     module.getDoc = function(id) {
 
+        observer.signal(
+            [ "search", "getDoc", "read" ],
+            { docId: id }
+        );
+
         return memory.index[id];
     }
 
@@ -81,12 +101,22 @@ module.exports = function(observer) {
 
     module.getRelation = function(id) {
 
+        observer.signal(
+            [ "search", "getRelation", "read" ],
+            { docId: id }
+        );
+
         return memory.index[id] ? memory.index[id].relation : [];
     }
 
 
 
     module.getBacklink = function(id) {
+
+        observer.signal(
+            [ "search", "getBacklink", "read" ],
+            { docId: id }
+        );
 
         return memory.invertedIndex[id];
     }
@@ -142,6 +172,11 @@ module.exports = function(observer) {
 
         results.sort(function(a, b) { return b.score - a.score; });
 
+        observer.signal(
+            [ "search", "find", "read" ],
+            { orQuery: orQuery, andQuery: andQuery, results: results }
+        );
+
         return results;
     };
 
@@ -196,11 +231,20 @@ module.exports = function(observer) {
 
         var result = [];
 
+        observer.pushActor("exploreForward");
+
         list.forEach(item => {
 
             var r = module.getRelation(item);
             if (r) result = result.concat(r);
         });
+
+        observer.popActor();
+
+        observer.signal(
+            [ "search", "exploreForward", "read" ],
+            { list: list, forward: result }
+        );
 
         return result;
     }
@@ -213,11 +257,20 @@ module.exports = function(observer) {
 
         var result = [];
 
+        observer.pushActor("exploreBackward");
+
         list.forEach(item => {
 
             var bl = module.getBacklink(item);
             if (bl) result = result.concat(bl);
         });
+
+        observer.popActor();
+
+        observer.signal(
+            [ "search", "exploreBackward", "read" ],
+            { list: list, backward: result }
+        );
 
         return result;
     }
@@ -241,7 +294,23 @@ module.exports = function(observer) {
             );
         });
 
+        observer.signal(
+            [ "search", "neighborhood", "read" ],
+            { list: list, neighborhood: result }
+        );
+
         return result;
+    }
+
+
+
+    module.link = function(relation) {
+
+        var id = newId();
+        module.addDoc(id, {
+            id: id,
+            relation: relation
+        });        
     }
 
 

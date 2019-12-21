@@ -1,4 +1,4 @@
-module.exports = function(observer) {
+module.exports = function(observer, search) {
 
 
 
@@ -6,7 +6,16 @@ module.exports = function(observer) {
 
 
 
-    const engines = {}
+    const engines = {};
+
+
+
+    function connectObserver(engineId, eventTags) {
+        
+        observer.observe(eventTags, engineId);
+
+        eventTags.forEach(tag => { search.link(["ObserverSubscription", engineId, tag]); });
+    }
 
 
 
@@ -14,24 +23,28 @@ module.exports = function(observer) {
 
         var id = filepath.slice(0, -3).replace(/\\/g, '.').replace(/\//g, '.');
 
+        if (engine.observedTags) connectObserver(id, engine.observedTags);
+
         engines[id] = engine;
 
-        readDoc(`
+        search.link(["core.ObjectType", id, "core.Engine"]);
+    };
 
-            # data
 
-            type: core.ObjectType, core.Engine, ${id}
 
-            input: EngineInput, ${id}, inputFrame
-            output: EngineOutput, ${id}, outputFrame
+    module.step = function() {
 
-            inputFrame
-            outputFrame
+        var actions = {};
 
-        `, filepath.slice(0,-2).replace(/\\/g, '.').replace(/\//g, '.'));
-    }
+        observer.dispatch(function(engId, inbox) {
 
-    
+            if (engines[engId].receive) actions[engId] = engines[engId].receive(inbox);
+        });
+
+        for (var engId in actions) engines[engId].execute(actions[engId]);
+    };
+
+
 
     return module;
 }

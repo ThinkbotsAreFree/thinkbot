@@ -15,6 +15,7 @@ keywords: core
 
 Root: ObjectType
 
-ObjectType: Engine
+ObjectType: Engine, ObserverSubscription
 
+Observer
 Engine
